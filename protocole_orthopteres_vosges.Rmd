@@ -25,7 +25,11 @@ L'indicateur mesuré sera donc la variation temporelle de l'occurrence multi-esp
 
 * Population statistique : Cortège des Orthoptères du massif vosgien et de la plaine
 * Échantillon : 450 mailles de 500m x 500m réparties aléatoirement dans l'aire d'étude
-* Unité d'échantillonnage : une maille de 500m x 500m
+* Unité d'échantillonnage : une maille de 500m $\times$ 500m
+
+Nous n'avons pas opéré de simulations pour définir le nombre de mailles dans l'échantillons.
+Nous pensons cependant que 450 mailles représente un nombre suffisant d'unités d'échantillonnage pour obtenir une bonne robustesse statistique.
+
 
 # Procédure automatisée dans R pour générer l'échantillon
 
