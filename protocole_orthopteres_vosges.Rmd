@@ -1,7 +1,7 @@
 ---
 title: "Proposition de protocole de suivi standardisé des Orthoptères du massif vosgien"
 author: "Jean-Pierre Vacher et Roberto d'Agostino"
-date: "3/28/2021"
+date: 'Première version Mars, 2021. Mise à jour Juin, 2021'
 output:
   pdf_document: default
   number_sections: true
@@ -13,10 +13,12 @@ knitr::opts_chunk$set(eval=FALSE)
 knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80),tidy=TRUE)
 ```
 
-# Objectif du suivi et indicateur mesuré
+# Contexte, objectif du suivi et indicateur mesuré
 
 Une récente étude basée sur des données récoltées de manière opportuniste a montré des tendances de modification de l'aire de répartition de plusieurs espèces d'Orthoptères dans le massif des Vosges, avec une contraction de l'aire d'espèces montagnardes et montée en altitude d'espèces de plaine [@DAgostino2021].
-Afin d'apprécier l'effet des changement climatiques sur les Orthoptères du Grand Est, le protocole de suivi standardisé proposé dans le présent document a pour objectif de mesurer la variation de la répartition altitudinale du cortège d'Orthoptères du massif des Vosges.
+Ces changements d'aire de répartition sont probablement liés aux changements climatiques survenus ces vingt dernières années, mais les données utilisées étaient insuffisantes pour tester cette hypothèse.
+Afin d'apprécier l'effet de ces changements sur les Orthoptères du massif vosgien, nous proposons un protocole de suivi standardisé inspiré d'une étude récente menée sur les communautés d'Orthoptères d'un gradient altitudinal dans le Parc national du Mercantour [@Mourguiart2020]. 
+Le protocole proposé dans le présent document a pour objectif de mesurer la variation de la répartition altitudinale du cortège d'Orthoptères du massif des Vosges.
 Pour cela, la stratégie d'échantillonnage est de disposer des placettes de suivi à différentes altitudes et de mesurer l'occurrence des espèces en prenant en compte la détection imparfaite.
 L'indicateur mesuré sera donc la variation temporelle de l'occurrence multi-espèces.
 
