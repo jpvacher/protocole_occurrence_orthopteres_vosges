@@ -17,17 +17,27 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80),tidy=TRUE)
 
 Une récente étude basée sur des données récoltées de manière opportuniste a montré des tendances de modification de l'aire de répartition de plusieurs espèces d'Orthoptères dans le massif des Vosges, avec une contraction de l'aire d'espèces montagnardes et montée en altitude d'espèces de plaine [@DAgostino2021].
 Ces changements d'aire de répartition sont probablement liés aux changements climatiques survenus ces vingt dernières années, mais les données utilisées étaient insuffisantes pour tester cette hypothèse.
-Afin d'apprécier l'effet de ces changements sur les Orthoptères du massif vosgien, nous proposons un protocole de suivi standardisé inspiré d'une étude récente menée sur les communautés d'Orthoptères d'un gradient altitudinal dans le Parc national du Mercantour [@Mourguiart2020]. 
-Le protocole proposé dans le présent document a pour objectif de mesurer la variation de la répartition altitudinale du cortège d'Orthoptères du massif des Vosges.
-Pour cela, la stratégie d'échantillonnage est de disposer des placettes de suivi à différentes altitudes et de mesurer l'occurrence des espèces en prenant en compte la détection imparfaite.
+Afin d'apprécier l'effet de ces changements sur les Orthoptères du massif vosgien, nous proposons un protocole de suivi standardisé inspiré d'une étude récente menée sur les communautés d'Orthoptères d'un gradient altitudinal dans le Parc national du Mercantour [@Mourguiart2020].
+
+Le protocole proposé dans le présent document a pour objectif de mesurer la variation de la répartition altitudinale des Orthoptères du massif des Vosges au cours du temps.
+Pour cela, la stratégie d'échantillonnage consiste à disposer des placettes de suivi à différentes altitudes et de mesurer l'occurrence des espèces en prenant en compte la détection imparfaite.
+
+
 L'indicateur mesuré sera donc la variation temporelle de l'occurrence multi-espèces.
 
 
 # Stratégie d'échantillonnage
 
-* Population statistique : Cortège des Orthoptères du massif vosgien et de la plaine
-* Échantillon : 450 mailles de 500m x 500m réparties aléatoirement dans l'aire d'étude
-* Unité d'échantillonnage : une maille de 500m $\times$ 500m
+## Aire d'étude
+
+L'aire d'étude comprend l'ensemble du massif des Vosges, incluant le piémont et une partie de la plaine attenante.
+Elle s'étend sur les départements suivants : Moselle, Meurthe-et-Moselle, Bas-Rhin, Haut-Rhin, Vosges.
+
+## Définitions
+
+* Population statistique : Aire de répartition des Orthoptères sur l'ensemble du massif vosgien (voir "Aire d'étude").
+* Échantillon : 450 mailles de 500m $\times$ 500m réparties aléatoirement dans l'aire d'étude.
+* Unité d'échantillonnage : une maille de 500m $\times$ 500m.
 
 Nous n'avons pas opéré de simulations pour définir le nombre de mailles dans l'échantillons.
 Nous pensons cependant que 450 mailles représente un nombre suffisant d'unités d'échantillonnage pour obtenir une bonne robustesse statistique.
@@ -61,8 +71,8 @@ proj4string(p)=CRS("+init=epsg:4326")
 p=spTransform(p, CRS("+init=epsg:2154"))
 ```
 
-Nous disposons maintenant d'un polygone en Lambert 93 (epsg:2154), donc des coordonnées métriques, qui correspond à l'aire d'étude.
-Nous allons transformer ce polygone en raster, avec des mailles de 500m x 500m, auxquelles nous allons associer un numéro qui sera séquentiel (1, 2, 3, 4,…)
+Nous disposons maintenant d'un polygone en Lambert 93 (epsg:2154), un système de coordonnées métriques, qui correspond à l'aire d'étude.
+Nous allons transformer ce polygone en raster, avec des mailles de 500m $\times$ 500m, auxquelles nous allons associer un identifiant qui sera issu d'une suite séquentielle (1, 2, 3, 4,…)
 
 ```{r}
 r=raster(p) #s'assurer que p est en Lambert 93 (epsg:2154)
@@ -93,7 +103,7 @@ gdEst=rbind(dpt[dpt@data$code_insee=="08",],dpt[dpt@data$code_insee=="10",],dpt[
 gdEst=spTransform(gdEst,CRS("+init=epsg:2154"))
 ```
 
-Puis, nous allons transformer de nouveau ce raster en couche vecteur avec polygones, pour obtenir une grille de mailles 500m x 500m qui recouvrira l'aire d'étude.
+Puis, nous allons transformer de nouveau ce raster en couche vecteur avec polygones, pour obtenir une grille de mailles 500m $\times$ 500m qui recouvrira l'aire d'étude.
 
 ```{r}
 grid.poly=rasterToPolygons(r)
@@ -115,8 +125,8 @@ sample=sample(d$ID,150, replace=F)
 ```
 
 ## Compartimenter l'aire d'étude
-Dans l'objectif d'avoir un échantillonnage qui soit équilibré entre les deux zones de plaine et la zone de montagne, nous allons compartimenter l'aire d'étude en trois sous-ensembles.
-Pour cela, nous divisons simplement le raster en trois sous-rasters.
+Dans l'objectif d'avoir un échantillonnage qui soit équilibré entre les deux zones de plaine et la zone de montagne, nous allons compartimenter l'aire d'étude en trois sous-ensembles qui contiendront chacun 150 mailles, pour un total de 450.
+Pour cela, nous divisons simplement le raster en trois sous-rasters puis nous y sélectionnons 150 mailles au hasard.
 
 ### Zone 1 : plaine côté Lorraine
 
@@ -187,8 +197,9 @@ raster::shapefile(grid.sample, file="grille_echantillon.shp")
 
 ## Définir des réplicats spatiaux
 
-Nous allons maintenant placer aléatoirement cinq réplicats spatiaux au sein de chaque maille de l'échantillon, qui correspondront à des mailles de 100m x 100m.
-Pour cela, nous définissons dans un premier temps une grille de 100m x 100m qui se superpose à la grille des échantillons.
+Nous allons maintenant placer aléatoirement cinq réplicats spatiaux au sein de chaque maille de l'échantillon.
+Chacun de ces réplicats spatiaux sont des mailles de 100m $\times$ 100m.
+Pour cela, nous définissons dans un premier temps une grille de 100m $\times$ 100m qui se superpose à la grille des échantillons.
 
 ```{r}
 rsubsample=raster(grid.sample)
@@ -199,9 +210,10 @@ subsample=raster::intersect(subsample, grid.sample)
 ```
 
 Cependant, cette opération s'avère très coûteuse en mémoire et ne fonctionnera sans doute pas sur un ordinateur ordinaire.
-Deux solutions sont possibles. La première consiste à réaliser cette opération dans un logiciel de SIG de type QGIS ou ArcGIS sur un ordinateur possédant un processeur puissant et beaucoup de RAM (de 16 à 32 GO de RAM).
+Deux solutions sont possibles. 
+La première consiste à réaliser cette opération dans un logiciel de SIG de type QGIS ou ArcGIS sur un ordinateur possédant un processeur puissant et beaucoup de RAM (de 16 à 32 GO de RAM).
 Autrement, il est également possible de continuer dans R en créant des sous-ensembles, puis nous les assemblerons ensuite.
-C'est ce que nous déroulons ci-après :
+C'est cette procédure que nous déroulons ci-après :
 
 ### Sous-grille n°1
 ```{r}
@@ -237,7 +249,7 @@ raster::shapefile(subsample,file="sous_grille_globale.shp")
 ```
 
 Enfin, nous procédons à une sélection aléatoire des cinq réplicats spatiaux au sein de chaque maille de l'échantillon.
-Chaque réplicats sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille dans la table de métadonnées.
+Chaque réplicat sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille dans la table de métadonnées.
 
 ```{r}
 spac.rep=ddply(as.data.frame(subsample),.(ID), function(x) x[sample(nrow(x),5),])
