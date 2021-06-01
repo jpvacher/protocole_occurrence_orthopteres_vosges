@@ -249,7 +249,7 @@ raster::shapefile(subsample,file="sous_grille_globale.shp")
 ```
 
 Enfin, nous procédons à une sélection aléatoire des cinq réplicats spatiaux au sein de chaque maille de l'échantillon.
-Chaque réplicat sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille dans la table de métadonnées.
+Chaque réplicats sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille dans la table de métadonnées.
 
 ```{r}
 spac.rep=ddply(as.data.frame(subsample),.(ID), function(x) x[sample(nrow(x),5),])
