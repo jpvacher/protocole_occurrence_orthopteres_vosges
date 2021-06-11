@@ -23,7 +23,7 @@ Le protocole proposé dans le présent document a pour objectif de mesurer la va
 Pour cela, la stratégie d'échantillonnage consiste à disposer des placettes de suivi à différentes altitudes et de mesurer l'occurrence des espèces en prenant en compte la détection imparfaite.
 
 
-L'indicateur mesuré sera donc la variation temporelle de l'occurrence multi-espèces.
+L'indicateur mesuré sera la variation temporelle de l'occurrence multi-espèces.
 
 
 # Stratégie d'échantillonnage
@@ -33,7 +33,7 @@ L'indicateur mesuré sera donc la variation temporelle de l'occurrence multi-esp
 L'aire d'étude comprend l'ensemble du massif des Vosges, incluant le piémont et une partie de la plaine attenante.
 Elle s'étend sur les départements suivants : Moselle, Meurthe-et-Moselle, Bas-Rhin, Haut-Rhin, Vosges.
 
-## Définitions
+## Quelques définitions
 
 * Population statistique : Aire de répartition des Orthoptères sur l'ensemble du massif vosgien (voir "Aire d'étude").
 * Échantillon : 450 mailles de 500m $\times$ 500m réparties aléatoirement dans l'aire d'étude.
@@ -44,6 +44,8 @@ Nous pensons cependant que 450 mailles représente un nombre suffisant d'unités
 
 
 # Procédure automatisée dans R pour générer l'échantillon
+
+Le code source est disponible dans le fichier intitulé “script_selection_sample_ortho.R”.
 
 ## Charger les packages
 
@@ -56,8 +58,9 @@ lapply(x, library, character.only=TRUE)
 
 ## Définir l'aire d'étude
 
-Dans un premier temps, nous définissons un polygone qui correspond à l'aire d'étude. Dans l'exemple ci-dessous, nous avons noté des coordonnées géographiques sur [\textcolor{blue}{Google maps}](https://google.com/maps) qui délimitent le massif des Vosges plus la plaine de part et d'autre, jusqu'à la Moselle à l'ouest et jusqu'au Rhin à l'est.
-Ces coordonnées sont bien entendu interchangeables, nous les utilisons seulement pour l'exemple.
+Ensuite, nous définissons un polygone qui correspond à l'aire d'étude.
+Dans l'exemple ci-dessous, nous avons relevé les coordonnées géographiques sur [\textcolor{blue}{Google maps}](https://google.com/maps) d'un polygone rectangulaire qui délimitent le massif des Vosges plus la plaine de part et d'autre, jusqu'à la Moselle à l'ouest et jusqu'au Rhin à l'est.
+Ces coordonnées sont bien entendu interchangeables et ajustables, nous les utilisons ici seulement pour l'exemple.
 
 ```{r}
 lon=data.frame(c(6.11,6.11,8.37, 8.37))
@@ -83,8 +86,8 @@ rownames(data)=data$V1
 values(r)=as.matrix(data)
 ```
 
-Plus loin dans le script on voudra retirer les régions qui ne sont pas dans le Grand Est (Allemagne, Haute-Saône).
-Pour cela, on télécharge les contours de la régions depuis la couche OPENSTREETMAP disponible sur le l'URL https://www.data.gouv.fr/en/datasets/r/01fdab09-ed86-4259-b863-69913a3e04d1, puis on dépose la couche dans le dossier de travail
+Plus loin dans le script, on voudra retirer les régions qui ne sont pas dans le Grand Est (Allemagne, Haute-Saône).
+Pour cela, on télécharge les contours de la régions depuis la couche OPENSTREETMAP disponible sur l'URL [\textcolor{blue}{https://www.data.gouv.fr/en/datasets/r/01fdab09-ed86-4259-b863-69913a3e04d1}](https://www.data.gouv.fr/en/datasets/r/01fdab09-ed86-4259-b863-69913a3e04d1), puis on dépose la couche dans le dossier de travail
 
 ```{r}
 download.file(
@@ -187,11 +190,11 @@ grid.sample3=grid.poly3[grid.poly3@data$ID %in% sample3,]
 
 ## Assemblage de l'échantillon total
 
-Une fois que les subset ont été générés, il suffit de les assembler pour avoir l'échantillon :
+Une fois que les sous-groupes ont été générés, nous les assemblons pour avoir l'échantillon complet :
 
 ```{r}
 grid.sample=rbind(grid.sample1, grid.sample2, grid.sample3)
-raster::shapefile(grid.sample, file="grille_echantillon.shp")
+raster::shapefile(grid.sample, file="grille_echantillon.shp") #permet de sauvegarder les mailles au format shape
 
 ```
 
@@ -199,7 +202,7 @@ raster::shapefile(grid.sample, file="grille_echantillon.shp")
 
 Nous allons maintenant placer aléatoirement cinq réplicats spatiaux au sein de chaque maille de l'échantillon.
 Chacun de ces réplicats spatiaux sont des mailles de 100m $\times$ 100m.
-Pour cela, nous définissons dans un premier temps une grille de 100m $\times$ 100m qui se superpose à la grille des échantillons.
+Pour cela, nous définissons d'abord une grille de 100m $\times$ 100m qui se superpose à la grille des échantillons.
 
 ```{r}
 rsubsample=raster(grid.sample)
@@ -210,7 +213,7 @@ subsample=raster::intersect(subsample, grid.sample)
 ```
 
 Cependant, cette opération s'avère très coûteuse en mémoire et ne fonctionnera sans doute pas sur un ordinateur ordinaire.
-Deux solutions sont possibles. 
+Deux solutions sont possibles pour contourner ce problème.
 La première consiste à réaliser cette opération dans un logiciel de SIG de type QGIS ou ArcGIS sur un ordinateur possédant un processeur puissant et beaucoup de RAM (de 16 à 32 GO de RAM).
 Autrement, il est également possible de continuer dans R en créant des sous-ensembles, puis nous les assemblerons ensuite.
 C'est cette procédure que nous déroulons ci-après :
@@ -249,7 +252,7 @@ raster::shapefile(subsample,file="sous_grille_globale.shp")
 ```
 
 Enfin, nous procédons à une sélection aléatoire des cinq réplicats spatiaux au sein de chaque maille de l'échantillon.
-Chaque réplicats sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille dans la table de métadonnées.
+Chaque réplicat sera numéroté de 1 à 5 dans les mailles, et contiendra le numéro de la maille associée dans la table de métadonnées.
 
 ```{r}
 spac.rep=ddply(as.data.frame(subsample),.(ID), function(x) x[sample(nrow(x),5),])
@@ -258,7 +261,7 @@ spac.rep@data$ID_rep=ave(spac.rep@data$ID_subplot, spac.rep@data$ID_plot, FUN=se
 spac.rep@data$layer=NULL
 spac.rep@data$ID=NULL
 spac.rep
-raster::shapefile(spac.rep, file="replicats_spatiaux.shp")
+raster::shapefile(spac.rep, file="replicats_spatiaux.shp") #permet de sauvegarder les mailles au format shape
 ```
 
 ```{r echo=F, eval=T, fig.align='center', warning=FALSE, fig.cap="Schéma d'une maille échantillon de 500m x 500m avec cinq réplicats spatiaux de 100m x 100m en vert."}
@@ -283,6 +286,8 @@ plot(grid,add=T, lwd=0.5)
 plot(spac.rep, add=T, col="forestgreen")
 ```
 
+La sélection de mailles échantillons et de sous-mailles pour les réplicats spatiaux est maintenant terminée, ces deux éléments ont été sauvegardés en couche shape dans le dossier de travail, respectivement “grille_echantillon.shp” et “replicats_spatiaux.shp”.
+
 # Protocole de récolte des données
 
 L'observateur aura à charge de noter la présence de toutes les espèces d'Orthoptères au sein des réplicats spatiaux.
@@ -300,10 +305,13 @@ Cette durée pourra être ajustée les années suivantes selon les résultats de
 
 * Température, mesurée à hauteur d'homme
 * Nébulosité, selon trois classes : ensoleillé, variable, couvert
+* Hauteur de la state herbacée (en cm)
 
 ## Covariables d'occurrence
 
 * Altitude
+* % de recouvrement par les zones forestières – forêts, bois, ripisylves, bosquets,… (à mesurer sur SIG dans un buffer de 500 m de rayon depuis le centroïde de la maille)
+* % de recouvrement par les zones ouvertes – prairies, friches, cultures, talus,… (à mesurer sur SIG dans un buffer de 500 m de rayon depuis le centroïde de la maille)
 
 ## Fréquence du suivi
 Le suivi sera mené durant deux années d'affilée au début, puis une fois tous les cinq ans.
